@@ -1,0 +1,15 @@
+
+# Executável
+vm
+
+# Arquivos compilados
+*.o
+
+# Arquivos de teste fornecidos pelo professor
+addresses.txt
+correct.txt
+BACKING_STORE.bin
+
+# Arquivos temporários
+*.swp
+*~
