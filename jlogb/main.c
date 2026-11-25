@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     TLB tlb;
     tlb_init(&tlb, tlb_policy);
     /* Gera a saída solicitada pelo enunciado. */
-    FILE *output = fopen("correct.txt", "w"); // Saída do programa
+    FILE *output = fopen("correct.txt", "w");
     if (!output) {
         perror("Erro ao criar correct.txt");
         memory_close(&memory); fclose(input);
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Endereco invalido na linha %lu\n", total + 1);
             failed = 1; break;
         }
-        int page = address / PAGE_SIZE, offset = address % PAGE_SIZE; // assume PAGE_SIZE = 256
+        int page = address / PAGE_SIZE, offset = address % PAGE_SIZE;
         int frame;
         int tlb_slot = tlb_lookup(&tlb, page, &frame);
         if (tlb_slot == -2) {
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
         if (tlb_slot >= 0) {
             memory_touch(&memory, frame);
         } else {
-            
+            /* A tabela de páginas é consultada no memory_resolve. */
             int evicted = -1;
             frame = memory_resolve(&memory, page, &evicted);
             if (frame < 0) { fprintf(stderr, "Erro ao carregar pagina %d\n", page); failed = 1; break; }
@@ -88,9 +88,7 @@ int main(int argc, char **argv) {
                 memory_value(&memory, frame, offset));
         total++;
     }
-
-
-    if (ferror(input)) { perror("Erro de leitura"); failed = 1; } // ferror = verifica se ocorreu algum erro de leitura no arquivo / perror = imprime a mensagem de erro correspondente ao valor atual da variável errno
+    if (ferror(input)) { perror("Erro de leitura"); failed = 1; }
     if (!failed && total == 0) { fprintf(stderr, "Arquivo de enderecos vazio\n"); failed = 1; }
     if (!failed) {
         fprintf(output, "Number of Translated Addresses = %lu\n", total);
@@ -99,8 +97,6 @@ int main(int argc, char **argv) {
         fprintf(output, "TLB Hits = %lu\n", tlb.hits);
         fprintf(output, "TLB Hit Rate = %.3f\n", (double)tlb.hits / total);
     }
-
-
     if (fclose(output) != 0) failed = 1;
     memory_close(&memory);
     fclose(input);

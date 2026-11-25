@@ -1,7 +1,7 @@
 #include "memory.h"
 #include <string.h>
 
-int memory_init(Memory *m, const char *path, Policy policy) { // (Lembrar) Policy é um tipo de enumeração que define a política de substituição de páginas (FIFO ou LRU)
+int memory_init(Memory *m, const char *path, Policy policy) {
     memset(m, 0, sizeof(*m));
     for (int i = 0; i < VIRTUAL_PAGES; i++) m->page_to_frame[i] = -1;
     for (int i = 0; i < PHYSICAL_FRAMES; i++) m->frame_to_page[i] = -1;
@@ -17,16 +17,12 @@ int memory_init(Memory *m, const char *path, Policy policy) { // (Lembrar) Polic
     return 0;
 }
 
-
 void memory_close(Memory *m) {
     if (m->backing) fclose(m->backing);
     m->backing = NULL;
 }
 
-
 void memory_touch(Memory *m, int frame) { m->used_at[frame] = ++m->clock; }
-
-
 
 int memory_resolve(Memory *m, int page, int *evicted_page) {
     *evicted_page = -1;
@@ -60,7 +56,6 @@ int memory_resolve(Memory *m, int page, int *evicted_page) {
     return frame;
 }
 
-
-int memory_value(const Memory *m, int frame, int offset) { // frame = memoria física, offset = deslocamento dentro da página 
+int memory_value(const Memory *m, int frame, int offset) {
     return m->data[frame][offset];
 }

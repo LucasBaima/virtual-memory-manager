@@ -1,0 +1,20 @@
+EVIDENCIAS DE TESTES - Virtual Memory Manager
+Ambiente de testes: Linux; compilacao GCC; entrada com 1000 enderecos.
+
+Compilacao: make / make vm256 / make vm-sequential - OK
+Comparacao: cmp correct.txt correct_reference.txt (lru fifo) - arquivos identicos.
+
+Algoritmo de paginas | Algoritmo TLB | Page Faults | TLB Hits
+FIFO | FIFO | 538 | 54
+FIFO | LRU  | 538 | 55
+LRU  | FIFO | 539 | 54
+LRU  | LRU  | 539 | 55
+
+Variante de 256 frames: LRU/FIFO -> 244 page faults; 54 TLB hits.
+Variante sem threads (128 frames): LRU/FIFO -> saida identica a referencia.
+
+Verificacoes de erro (programa encerrou com falha como esperado):
+- Ausencia de argumentos;
+- Algoritmo invalido;
+- Arquivo de entrada inexistente;
+- Endereco de entrada com caracteres nao numericos.
