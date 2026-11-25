@@ -1,0 +1,46 @@
+Relatório - Gerenciador de Memória Virtual
+Disciplina: Infraestrutura de Software | Implementação: 6 | Linguagem: C
+Repositório: https://github.com/LucasBaima/virtual-memory-manager
+1. Objetivo
+O trabalho consiste em simular a tradução de endereços virtuais para endereços físicos usando
+memória paginada. A implementação principal considera 256 páginas virtuais, com 256 bytes cada, e
+128 frames físicos. Também foram testadas variantes com 256 frames e sem threads na TLB.
+2. Organização do programa
+O arquivo main.c recebe o arquivo de endereços e os algoritmos escolhidos. O módulo memory.c
+gerencia os frames, o mapeamento das páginas e os acessos ao BACKING_STORE.bin. O módulo tlb.c
+controla a TLB de 16 entradas, inclusive a pesquisa paralela por meio de pthreads. O pagetable.c
+disponibiliza uma consulta simples ao mapeamento página-frame.
+3. Tradução dos endereços
+Para um endereço virtual A, a página é obtida por A / 256 (divisão inteira) e o deslocamento por A %
+256. Ao localizar o frame F, o endereço físico é F * 256 + deslocamento. Uma página ausente da
+memória causa page fault e é carregada do arquivo binário. Os valores lidos são tratados como bytes
+com sinal, de acordo com a saída de referência.
+4. FIFO e LRU
+Foram implementadas as duas políticas na substituição de páginas e na TLB. FIFO substitui a entrada
+mais antiga de acordo com a ordem de entrada; LRU substitui a que foi utilizada menos recentemente.
+Quando uma página é removida da memória física, a sua entrada na TLB é invalidada para evitar uma
+tradução desatualizada.
+5. Threads e validação
+Na variante principal, a procura na TLB cria uma thread para cada uma das 16 entradas; o resultado só
+é utilizado depois do encerramento das threads. O programa verifica a quantidade de argumentos, as
+opções de política, a abertura dos arquivos e a validade de cada endereço informado. Foram
+exercitados erros de argumentos e entradas inválidas.
+6. Resultados dos testes
+Páginas TLB Page faults TLB hits
+FIFO FIFO 538 54
+FIFO LRU 538 55
+LRU FIFO 539 54
+LRU LRU 539 55
+A entrada possui 1.000 endereços. Na configuração utilizada pela referência (LRU para páginas e FIFO
+para TLB), o arquivo correct.txt produzido foi idêntico ao arquivo de referência em comparação byte a
+byte. Na variante com 256 frames foram observados 244 page faults e 54 TLB hits; a variante sem
+threads também reproduziu a referência.
+7. Compilação e execução
+Dentro da pasta jlogb, executar make, seguido por ./vm addresses.txt lru fifo. O programa cria
+correct.txt. Os arquivos addresses.txt e BACKING_STORE.bin são necessários localmente para os testes,
+mas não acompanham o pacote de entrega.
+8. Conclusão
+A implementação permite observar como a tabela de páginas, os frames e a TLB interagem na tradução
+de endereços. Os testes mostram o comportamento das políticas FIFO e LRU, tanto na memória física
+quanto na TLB. O projeto foi organizado em módulos para facilitar a verificação de cada
+responsabilidade.
